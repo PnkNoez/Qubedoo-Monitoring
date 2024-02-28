@@ -1,0 +1,40 @@
+- name: deploy traefik
+  hosts: monitor
+  become: yes
+  vars: 
+    apt_packages:
+      - docker
+      - python3-pip
+      - python3-docker
+      - docker-compose
+  tasks:
+    - name: Update apt_packages
+      ansible.builtin.apt:
+        name: "{{apt_packages}}"
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Create dir 
+      ansible.builtin.file:
+        path: /opt/traefik/dynamic 
+        state: directory 
+    
+    - name: Copy traefik compose
+      ansible.builtin.copy:
+        src: docker-compose.yml   
+        dest: /opt/traefik     
+
+    - name: Copy config.yml
+      ansible.builtin.copy:
+        src: config.yml   
+        dest: /opt/traefik/dynamic     
+
+    - name: Run `docker-compose up` 
+      community.docker.docker_compose:
+        project_src: /opt/traefik
+        restarted: true
+        recreate: always
+        remove_volumes: true
+        remove_orphans: true
+        files: 
+          - docker-compose.yml

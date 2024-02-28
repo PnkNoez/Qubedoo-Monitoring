@@ -1,0 +1,23 @@
+http:
+  routers:
+    grafana:
+      rule: "Host(`monitor.staging.qubedoo.com`)"
+      service: grafana
+      entryPoints: websecure
+      tls:
+        certResolver: myresolver
+
+          #prometheus:
+          #  rule: "Host(`monitor.staging.qubedoo.com`)"
+          #  service: prometheus
+
+  services:
+    grafana:
+      loadBalancer:
+        servers:
+          - url: "http://localhost:3000"
+
+            # prometheus:
+            #   loadBalancer:
+            #     servers:
+            #       - url: "10.0.0.6:9090"

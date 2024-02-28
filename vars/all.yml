@@ -1,0 +1,8 @@
+grafana_admin_password: "vM$PSo6mUE@@RHT9qe$x89JEsxsLYoZAY#2grD4ys$DU396f%*"
+
+exporters:
+  - 10.0.0.5:9100
+  - 10.0.0.4:9100
+  - 10.0.0.3:9100
+  - 10.0.0.2:9100
+

@@ -1,0 +1,79 @@
+- name: prometheus-playbook
+  hosts: monitor
+  become: yes
+  vars_files:
+    - vars/all.yml
+  vars:
+    prometheus_interface: 10.0.0.6
+    apt_packages:
+      - prometheus
+      - prometheus-alertmanager
+      - grafana
+  tasks:
+    - name: add gpg hey
+      apt_key:
+        url: "https://packages.grafana.com/gpg.key"
+        validate_certs: no
+
+    - name: add repository
+      apt_repository:
+        repo: "deb https://packages.grafana.com/oss/deb stable main"
+        state: present
+        validate_certs: no
+
+    - name: Update apt_packages
+      ansible.builtin.apt:
+        name: "{{apt_packages}}"
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Template prometheus.conf
+      ansible.builtin.template:
+        src: templates/prometheus.yml.j2
+        dest: /etc/prometheus/prometheus.yml
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: set prometheus interface
+      ansible.builtin.lineinfile:
+        path: /etc/default/prometheus
+        regexp: '^ARGS='
+        line: 'ARGS="--web.listen-address={{prometheus_interface}}:9090"'
+
+    - name: start service prometheus
+      systemd:
+        name: prometheus
+        state: restarted
+        enabled: yes
+
+    - name: start service grafana-server
+      systemd:
+        name: grafana-server
+        state: restarted
+        enabled: yes
+
+    - name: wait for service up
+      uri:
+        url: "http://127.0.0.1:3000"
+        status_code: 200
+      register: __result
+      until: __result.status == 200
+      retries: 120
+      delay: 1
+
+        #    - name: change admin password for grafana gui
+        #      shell: "grafana-cli admin reset-admin-password \
+        #              {{ grafana_admin_password }}"
+        #      register: __command_admin
+        #      changed_when: "__command_admin.rc == 0"
+        #      ignore_errors: true
+        #      failed_when: "__command_admin.rc not in [0,1]"
+
+  handlers:
+    - name: restart_prometheus
+      systemd:
+        name: prometheus
+        state: restarted
+        enabled: yes
+        daemon_reload: yes
