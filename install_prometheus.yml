@@ -6,6 +6,10 @@
   vars:
     prometheus_interface: 10.0.0.6
     apt_packages:
+      - docker
+      - python3-pip
+      - python3-docker
+      - docker-compose
       - prometheus
       - prometheus-alertmanager
       - grafana
