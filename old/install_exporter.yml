@@ -1,0 +1,39 @@
+- name: exporter-playbook
+  hosts: others
+  become: yes
+  vars_files:
+    - vars/all.yml
+  vars:
+    apt_packages:
+      - prometheus-node-exporter
+  tasks:
+    - name: Update apt_packages
+      ansible.builtin.apt:
+        name: "{{apt_packages}}"
+        update_cache: yes
+        cache_valid_time: 3600
+ 
+    - name: start service prometheus-node-exporter
+      systemd:
+        name: prometheus-node-exporter
+        state: started
+        enabled: yes
+
+    - name: set exporter interface
+      ansible.builtin.lineinfile:
+        path: /etc/default/prometheus-node-exporter
+        regexp: '^ARGS='
+        line: 'ARGS="--web.listen-address={{exporter_interface}}:9100"'
+      notify: reload_daemon_and_restart_node_exporter
+    
+    - name: Debug message before notifying handler
+      ansible.builtin.debug:
+        msg: "About to modify prometheus-node-exporter configuration and notify handler."
+    
+  handlers:
+    - name: reload_daemon_and_restart_node_exporter
+      systemd:
+        name: prometheus-node-exporter
+        state: restarted
+        daemon_reload: yes
+        enabled: yes

@@ -1,0 +1,25 @@
+apiVersion: 1
+
+datasources:
+  - name: Prometheus-0
+    type: prometheus
+    access: proxy
+    orgId: 1
+    url: http://prometheus:9090
+    isDefault: true
+    jsonData:
+      graphiteVersion: "1.1"
+      tlsAuth: false
+      tlsAuthWithCACert: false
+      tlsSkipVerify: false
+      tlsClientCert: ""
+      tlsClientKey: ""
+      tlsClientCertFile: ""
+      tlsClientKeyFile: ""
+      tlsCACert: ""
+      grafanaURL: ""
+      promExUrl: ""
+      timeInterval: ""
+      results: 0
+    readOnly: false
+
