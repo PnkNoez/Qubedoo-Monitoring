@@ -1,0 +1,43 @@
+---
+name: Build Docker Image for grafana stack Image on push branch main  
+
+on:
+  push:
+    branches:
+      - 'main'
+jobs:
+  build:
+    permissions: write-all
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to formitas registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract branch name
+        shell: bash
+        run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+        id: extract_branch
+
+      - name: Scrape build info
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+
+      - name: Build and push docker image to ghcr.io
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ghcr.io/formitas-ag/prometheus:${{ steps.extract_branch.outputs.branch }} 
+            ghcr.io/formitas-ag/prometheus:${{ steps.meta.outputs.tags }}
+            build-args: |
+            GIT_VERSION_TAG=${{ env.RELEASE_VERSION }}
+
