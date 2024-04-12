@@ -38,6 +38,6 @@ jobs:
           tags: |
             ghcr.io/formitas-ag/prometheus:${{ steps.extract_branch.outputs.branch }} 
             ghcr.io/formitas-ag/prometheus:${{ steps.meta.outputs.tags }}
-            build-args: |
+          build-args: |
             GIT_VERSION_TAG=${{ env.RELEASE_VERSION }}
 
