@@ -2,9 +2,9 @@
 name: Build Docker Image for grafana stack Image on push branch main  
 
 on:
-  push:
-    branches:
-      - 'main'
+  pull_request:
+    branches: ["main"]
+
 jobs:
   build:
     permissions: write-all
@@ -21,14 +21,13 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: save build tag in environment variable
+        run: echo "BUILD_TAG=$(date +'%Y%m%d')" >> $GITHUB_ENV
+
       - name: Extract branch name
         shell: bash
         run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
         id: extract_branch
-
-      - name: Extract metadata for the Docker image
-        id: meta
-        uses: docker/metadata-action
 
       - name: Build and push docker image to ghcr.io
         uses: docker/build-push-action@v5
@@ -37,7 +36,8 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            ghcr.io/formitas-ag/prometheus:${{ steps.extract_branch.outputs.branch }} 
-            ghcr.io/formitas-ag/prometheus:${{ steps.meta.outputs.tags }}
+            ghcr.io/formitas-ag/prometheus:${{ steps.extract_branch.outputs.branch }}
+            ghcr.io/formitas-ag/prometheus:${{ env.BUILD_TAG }}
+            ghcr.io/formitas-ag/prometheus:latest
 
-
+            
