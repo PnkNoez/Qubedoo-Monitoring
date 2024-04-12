@@ -16,7 +16,7 @@
 
     - name: Run `docker-compose up` 
       community.docker.docker_compose:
-        project_src: /opt/prometheus
+        project_src: /files
         restarted: true
         recreate: always
         remove_volumes: true
