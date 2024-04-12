@@ -15,8 +15,4 @@ COPY vars /code/vars
 RUN mkdir ~/.ssh/ &&\
     chmod 700 ~/.ssh/ 
 
-ARG GIT_VERSION_TAG=yolo
-WORKDIR /usr/src/myapp
-RUN echo $GIT_VERSION_TAG > GIT_VERSION_TAG.txt
-
 CMD ansible-playbook --version 
