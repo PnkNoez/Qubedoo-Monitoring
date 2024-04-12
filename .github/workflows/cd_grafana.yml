@@ -1,0 +1,37 @@
+---
+name: Grafana and Prometheus Deployment
+
+on: [workflow_dispatch]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Login to Formitas registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: formitas-ag
+          password: ${{ secrets.ACTIONS_KEY }}
+
+      - name: Pull Docker Image
+        run: docker pull ghcr.io/formitas-ag/prometheus:main
+
+      - name: Create files
+        run: |
+          mkdir -p secrets/ansible-vault secrets/.ssh
+          echo "${{ secrets.SSH_KEY }}" > secrets/.ssh/id_rsa
+          echo "${{ env.KNOWN_HOSTS }}" > secrets/.ssh/known_hosts
+
+      - name: run ansible-playbook
+        run: |
+          docker run \
+            -v $PWD/secrets/.ssh:/root/.ssh\
+            ghcr.io/formitas/prometheus:main \
+            ansible-playbook \
+              --inventory inventories/inventory.ini \
+              install_grafana.yml
