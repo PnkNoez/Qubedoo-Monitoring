@@ -8,7 +8,7 @@ RUN apk add --update py-pip openssl ca-certificates bash git sudo zip \
     && apk --update add sshpass openssh-client \
     && apk del build-dependencies \
     && rm -rf /var/cache/apk/* 
-COPY install.yml /code
+COPY install_grafana.yml /code
 COPY inventories /code/inventories
 COPY files /code/files    
 COPY vars /code/vars    
