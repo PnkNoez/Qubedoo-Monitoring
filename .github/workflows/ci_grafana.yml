@@ -39,5 +39,3 @@ jobs:
             ghcr.io/formitas-ag/prometheus:${{ steps.extract_branch.outputs.branch }}
             ghcr.io/formitas-ag/prometheus:${{ env.BUILD_TAG }}
             ghcr.io/formitas-ag/prometheus:latest
-
-            
