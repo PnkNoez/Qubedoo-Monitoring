@@ -1,9 +1,10 @@
 ---
-name: Build Docker Image for grafana stack Image on push branch main  
+name: Build Docker Image for grafana stack Image on push branch main
 
 on:
-  pull_request:
-    branches: ["main"]
+  push:
+    branches:
+      - 'main'
 
 jobs:
   build:

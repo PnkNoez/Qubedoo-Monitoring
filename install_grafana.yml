@@ -1,0 +1,25 @@
+- name: deploy traefik
+  hosts: monitor
+  become: yes
+  vars: 
+    apt_packages:
+      - docker
+      - python3-pip
+      - python3-docker
+      - docker-compose
+  tasks:
+    - name: Update apt_packages
+      ansible.builtin.apt:
+        name: "{{apt_packages}}"
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Run `docker-compose up` 
+      community.docker.docker_compose:
+        project_src: /opt/prometheus
+        restarted: true
+        recreate: always
+        remove_volumes: true
+        remove_orphans: true
+        files: 
+          - docker-compose.yml
