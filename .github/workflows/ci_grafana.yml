@@ -36,6 +36,5 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            ghcr.io/formitas-ag/prometheus:${{ steps.extract_branch.outputs.branch }} 
-            ghcr.io/formitas-ag/prometheus:${{ steps.meta.outputs.tags }}
+            ghcr.io/formitas-ag/prometheus:${{ steps.extract_branch.outputs.branch }}
 
