@@ -1,5 +1,5 @@
 ---
-name: Build Docker Image for grafana stack Image on push branch main
+name: Build Docker Image for grafana stack
 
 on:
   push:
