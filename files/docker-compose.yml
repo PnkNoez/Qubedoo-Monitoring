@@ -26,8 +26,6 @@ services:
     image: "grafana/grafana"
     depends_on:
       - prometheus
-    ports:
-      - 3000:3000
     volumes:
       - "grafana_data:/var/lib/grafana"
       - "./provisioning:/etc/grafana/provisioning"
@@ -40,14 +38,15 @@ services:
       - "traefik.http.routers.grafana.entrypoints=websecure"
       - "traefik.http.routers.grafana.tls=true"
       - "traefik.http.routers.grafana.tls.certresolver=myresolver"
+      - "traefik.http.middlewares.auth.basicauth.users=formitas:$$2y$$05$$I42xs7Q.dz/VcXHjMSo6A.ORWaSiomF6ekuq2u1Foxn3Pm37bDUue" 
+      - "traefik.http.routers.grafana.middlewares=auth@docker"
 
   prometheus:
     image: prom/prometheus
-    ports:
-      - 9090:9090
     volumes:
       - "./prometheus:/etc/prometheus"
       - "prometheus_data:/prometheus_data"
+      - "./alerting:/etc/alerting"
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.retention.time=15d'
@@ -60,6 +59,28 @@ services:
       - "traefik.http.routers.prometheus.entrypoints=websecure"
       - "traefik.http.routers.prometheus.tls=true"
       - "traefik.http.routers.prometheus.tls.certresolver=myresolver"
+      - "traefik.http.middlewares.auth.basicauth.users=formitas:$$2y$$05$$I42xs7Q.dz/VcXHjMSo6A.ORWaSiomF6ekuq2u1Foxn3Pm37bDUue" 
+      - "traefik.http.routers.prometheus.middlewares=auth@docker"
+
+  alertmanager:
+    image: prom/alertmanager
+    volumes:
+      - ./alertmanager:/etc/alertmanager
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+    restart: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.alertmanager.loadbalancer.server.port=9093"
+
+      - "traefik.http.routers.alertmanager.rule=Host(`alertmanager.qubedoo.com`)"
+      - "traefik.http.routers.alertmanager.entrypoints=websecure"
+      - "traefik.http.routers.alertmanager.tls=true"
+      - "traefik.http.routers.alertmanager.tls.certresolver=myresolver"
+      - "traefik.http.middlewares.auth.basicauth.users=formitas:$$2y$$05$$I42xs7Q.dz/VcXHjMSo6A.ORWaSiomF6ekuq2u1Foxn3Pm37bDUue" 
+      - "traefik.http.routers.alertmanager.middlewares=auth@docker"
+
 volumes:
   prometheus_data:
   grafana_data:
+

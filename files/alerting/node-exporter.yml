@@ -1,0 +1,12 @@
+groups:
+- name: rule for node-exporter
+  rules:
+  - alert: HighErrorRate
+    expr: job:http_errors_per_second:rate5m{job="myjob"} > 10
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "High error rate on {{ $labels.instance }}"
+      description: "{{ $labels.instance }} has a high error rate ({{ $value }} errors per second)"
+

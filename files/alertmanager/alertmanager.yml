@@ -1,0 +1,15 @@
+global:
+  resolve_timeout: 5m
+
+route:
+  group_by: ['alertname']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 12h
+  receiver: 'teams-webhook'
+
+receivers:
+- name: 'teams-webhook'
+  webhook_configs:
+  - send_resolved: true
+    url: 'https://prod-139.westeurope.logic.azure.com:443/workflows/ecd7e7a3399f4245b8b683ff2966b8f3/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=qD0mdgenTy2qywySz4vx5yisCWV944jupdcMWMUs0Ys'
