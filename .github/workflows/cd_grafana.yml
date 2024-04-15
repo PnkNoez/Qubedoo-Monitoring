@@ -24,7 +24,7 @@ jobs:
       - name: Create files
         run: |
           mkdir -p secrets/ansible-vault secrets/.ssh
-          echo "${{ secrets.SSH_KEY }}" > secrets/.ssh/id_rsa
+          echo "${{ secrets.SSH_KEY }}" > secrets/.ssh/id_server
           echo "${{ env.KNOWN_HOSTS }}" > secrets/.ssh/known_hosts
 
       - name: run ansible-playbook
