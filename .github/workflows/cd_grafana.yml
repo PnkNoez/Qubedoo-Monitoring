@@ -30,8 +30,11 @@ jobs:
       - name: run ansible-playbook
         run: |
           docker run \
-            -v $PWD/secrets/.ssh:/root/.ssh\
-            ghcr.io/qubedoo/deployment-config \
-            ansible-playbook \
-              --inventory inventories/inventory.ini \
-              install.yml
+          -v $PWD:/deploy ghcr.io/qubedoo/deployment-config \
+          ash -c \
+          'cd /deploy; \ 
+          ansible-playbook --private-key=secrets/.ssh/id_server \
+          -i inventories/inventory.ini \
+          install.yml'
+
+
