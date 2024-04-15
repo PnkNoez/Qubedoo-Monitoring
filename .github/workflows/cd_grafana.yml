@@ -19,7 +19,7 @@ jobs:
           password: ${{ secrets.ACTIONS_KEY }}
 
       - name: Pull Docker Image
-        run: docker pull ghcr.io/formitas-ag/prometheus:main
+        run: docker pull ghcr.io/qubedoo/deployment-config:main
 
       - name: Create files
         run: |
@@ -30,7 +30,7 @@ jobs:
       - name: run ansible-playbook
         run: |
           docker run \
-          -v $PWD:/deploy ghcr.io/qubedoo/deployment-config \
+          -v $PWD:/deploy ghcr.io/qubedoo/deployment-config:main \
           ash -c \
           'cd /deploy; \ 
           ansible-playbook --private-key=secrets/.ssh/id_server \
