@@ -9,6 +9,7 @@ RUN apk add --update py-pip openssl ca-certificates bash git sudo zip \
     && apk del build-dependencies \
     && rm -rf /var/cache/apk/* 
 COPY install_grafana.yml /code
+COPY ansible.cfg /code
 COPY inventories /code/inventories
 COPY files /code/files    
 COPY vars /code/vars    
