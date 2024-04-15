@@ -31,7 +31,7 @@ jobs:
         run: |
           docker run \
             -v $PWD/secrets/.ssh:/root/.ssh\
-            ghcr.io/formitas-ag/prometheus:main \
+            ghcr.io/qubedoo/deployment-config \
             ansible-playbook \
               --inventory inventories/inventory.ini \
-              install_grafana.yml
+              install.yml
