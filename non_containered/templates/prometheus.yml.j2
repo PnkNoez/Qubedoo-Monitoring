@@ -1,6 +1,6 @@
 global:
-  scrape_interval:     15s 
-  evaluation_interval: 15s 
+  scrape_interval:     15s
+  evaluation_interval: 15s
   external_labels:
       monitor: 'example'
 alerting:
@@ -8,7 +8,6 @@ alerting:
   - static_configs:
     - targets: ['localhost:9093']
 rule_files:
-  - '/etc/alerting/alert_rules/*.yml'
 scrape_configs:
   - job_name: 'prometheus'
     scrape_interval: 5s
@@ -17,8 +16,7 @@ scrape_configs:
       - targets: ['localhost:9090']
   - job_name: node
     static_configs:
-      - targets: ['10.0.0.7:9100']
-      - targets: ['10.0.0.5:9100']
-      - targets: ['10.0.0.4:9100']
-      - targets: ['10.0.0.3:9100']
-      - targets: ['10.0.0.2:9100']
+      - targets: ['localhost:9100']
+{% for exporter_interface in exporters %}
+      - targets: ['{{exporter_interface}}']
+{% endfor %}

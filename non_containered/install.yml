@@ -27,7 +27,7 @@
         path: /opt/prometheus 
         state: directory 
     
-    - name: Copy files to server 
+    - name: Copy dashboards
       ansible.builtin.copy:
         src: ./files/{{item}}
         dest: /opt/prometheus     
