@@ -6,7 +6,7 @@ contactPoints:
   # <int> organization ID, default = 1
   - orgId: 1
     # <string, required> name of the contact point
-    name: cp_1
+    name: qubedoo-teams
     receivers:
       # <string, required> unique identifier for the receiver. Should not exceed 40 symbols. Only letters, numbers, - (hyphen), and _ (underscore) allowed.
       - uid: first_uid
@@ -16,4 +16,4 @@ contactPoints:
         disableResolveMessage: false
         # <object, required> settings for the specific receiver type
         settings:
-          url: http://alertmanager:8089
+          url: http://alertmanager:9093

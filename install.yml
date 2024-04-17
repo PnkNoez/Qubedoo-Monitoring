@@ -3,7 +3,6 @@
   become: yes
   vars: 
     copy_path_to_host:
-      - alerting
       - alertmanager
       - dashboards
       - prometheus
