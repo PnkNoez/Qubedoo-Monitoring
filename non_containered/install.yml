@@ -2,6 +2,14 @@
   hosts: monitor
   become: yes
   vars: 
+    copy_path_to_host:
+      - alerting
+      - alertmanager
+      - dashboards
+      - prometheus
+      - docker-compose.yml
+      - provisioning
+
     apt_packages:
       - docker
       - python3-pip
@@ -14,9 +22,20 @@
         update_cache: yes
         cache_valid_time: 3600
 
+    - name: Create dir 
+      ansible.builtin.file:
+        path: /opt/prometheus 
+        state: directory 
+    
+    - name: Copy dashboards
+      ansible.builtin.copy:
+        src: ./files/{{item}}
+        dest: /opt/prometheus     
+      with_items: "{{copy_path_to_host}}"
+
     - name: Run `docker-compose up` 
       community.docker.docker_compose:
-        project_src: /files
+        project_src: /opt/prometheus
         restarted: true
         recreate: always
         remove_volumes: true

@@ -3,7 +3,6 @@
   become: yes
   vars: 
     copy_path_to_host:
-      - alerting
       - alertmanager
       - dashboards
       - prometheus
@@ -27,7 +26,7 @@
         path: /opt/prometheus 
         state: directory 
     
-    - name: Copy dashboards
+    - name: Copy files to server 
       ansible.builtin.copy:
         src: ./files/{{item}}
         dest: /opt/prometheus     
