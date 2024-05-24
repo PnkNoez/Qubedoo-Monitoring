@@ -75,8 +75,7 @@ services:
     restart: always
     labels:
       - "traefik.enable=true"
-      - "traefik.http.services.alertmanager.loadbalancer.server.port=9093"
-
+      # no loadbalancer will handle the route. this is declared in the alertmanager.yml conf
       - "traefik.http.routers.alertmanager.rule=Host(`alertmanager.qubedoo.com`)"
       - "traefik.http.routers.alertmanager.entrypoints=websecure"
       - "traefik.http.routers.alertmanager.tls=true"
