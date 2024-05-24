@@ -89,25 +89,13 @@ services:
     container_name: webhook_tester
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.hook.rule=Host(`alertmanager.qubedoo.com`)"
-      - "traefik.http.routers.hook.entrypoints=websecure"
-
       - "traefik.http.services.hook.loadbalancer.server.port=8080"
 
-  grafana:
-    image: "grafana/grafana"
-    depends_on:
-      - prometheus
-    volumes:
-      - "grafana_data:/var/lib/grafana"
-      - "./provisioning:/etc/grafana/provisioning"
-      - "./dashboards:/etc/dashboards"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.grafana.rule=Host(`grafana.localhost`)"
-      - "traefik.http.routers.grafana.entrypoints=web"
+      - "traefik.http.routers.hook.rule=Host(`alertmanager.qubedoo.com`)"
+      - "traefik.http.routers.hook.entrypoints=websecure"
+      - "traefik.http.routers.hook.tls=true"
+      - "traefik.http.routers.hook.tls.certresolver=myresolver"
 
 volumes:
   prometheus_data:
   grafana_data:
-
