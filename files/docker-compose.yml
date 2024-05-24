@@ -2,6 +2,7 @@ version: "3.3"
 services:
   traefik:
     image: "traefik:v2.11"
+    container_name: traefik
     command:
       - "--log.level=DEBUG"
       - "--providers.docker=true"
@@ -24,6 +25,7 @@ services:
   
   grafana:
     image: "grafana/grafana"
+    container_name: grafana
     depends_on:
       - prometheus
     volumes:
@@ -43,6 +45,7 @@ services:
 
   prometheus:
     image: prom/prometheus
+    container_name: prometheus
     volumes:
       - "./prometheus:/etc/prometheus"
       - "prometheus_data:/prometheus_data"
@@ -64,6 +67,7 @@ services:
 
   alertmanager:
     image: prom/alertmanager
+    container_name: alertmanager
     volumes:
       - ./alertmanager:/etc/alertmanager
     command:
@@ -79,6 +83,29 @@ services:
       - "traefik.http.routers.alertmanager.tls.certresolver=myresolver"
       - "traefik.http.middlewares.auth.basicauth.users=formitas:$$2y$$05$$I42xs7Q.dz/VcXHjMSo6A.ORWaSiomF6ekuq2u1Foxn3Pm37bDUue" 
       - "traefik.http.routers.alertmanager.middlewares=auth@docker"
+
+  hook:
+    image: coveros/webhook-tester
+    container_name: webhook_tester
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.hook.rule=Host(`alertmanager.qubedoo.com`)"
+      - "traefik.http.routers.hook.entrypoints=websecure"
+
+      - "traefik.http.services.hook.loadbalancer.server.port=8080"
+
+  grafana:
+    image: "grafana/grafana"
+    depends_on:
+      - prometheus
+    volumes:
+      - "grafana_data:/var/lib/grafana"
+      - "./provisioning:/etc/grafana/provisioning"
+      - "./dashboards:/etc/dashboards"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.grafana.rule=Host(`grafana.localhost`)"
+      - "traefik.http.routers.grafana.entrypoints=web"
 
 volumes:
   prometheus_data:
