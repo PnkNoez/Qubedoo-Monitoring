@@ -1,0 +1,81 @@
+---
+- name: Install and Manage OpenVPN service
+  hosts: monitor
+  become: yes
+  tasks:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: yes
+
+    - name: Install OpenVPN
+      ansible.builtin.apt:
+        name: openvpn
+        state: present
+
+    - name: Create OpenVPN configuration directory
+      ansible.builtin.file:
+        path: /etc/openvpn/client
+        state: directory
+        mode: '0755'
+
+    - name: Check if OpenVPN configuration file exists
+      ansible.builtin.stat:
+        path: /etc/openvpn/client/hetznervpn@mail.formitas.de.ovpn
+      register: openvpn_config
+
+    - name: Copy OpenVPN configuration file
+      ansible.builtin.copy:
+        src: ./creds/login.conf
+        dest: /etc/openvpn/client/login.conf
+        mode: '0644'
+
+    - name: Copy OpenVPN configuration file
+      ansible.builtin.copy:
+        src: ./creds/hetznervpn@mail.formitas.de.ovpn
+        dest: /etc/openvpn/client/hetznervpn@mail.formitas.de.ovpn
+        mode: '0644'
+      when: not openvpn_config.stat.exists
+
+    - name: Ensure OpenVPN service is enabled and started
+      ansible.builtin.systemd:
+        name: openvpn@client
+        enabled: yes
+        state: started
+
+    - name: Create systemd service unit file for OpenVPN
+      ansible.builtin.copy:
+        dest: /etc/systemd/system/openvpn-client.service
+        content: |
+          [Unit]
+          Description=OpenVPN client
+          After=network.target
+
+          [Service]
+          Type=simple
+          ExecStart=/usr/sbin/openvpn --config /etc/openvpn/client/hetznervpn@mail.formitas.de.ovpn
+          Restart=on-failure
+          RestartSec=5
+
+          [Install]
+          WantedBy=multi-user.target
+      notify: restart openvpn
+
+    - name: Reload systemd to recognize the new service
+      ansible.builtin.systemd:
+        daemon_reload: yes
+
+    - name: Enable OpenVPN service
+      ansible.builtin.systemd:
+        name: openvpn-client
+        enabled: yes
+
+    - name: Start OpenVPN service
+      ansible.builtin.systemd:
+        name: openvpn-client
+        state: started
+
+  handlers:
+    - name: restart openvpn
+      ansible.builtin.systemd:
+        name: openvpn-client
+        state: restarted
