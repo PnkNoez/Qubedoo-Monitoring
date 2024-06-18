@@ -1,1 +1,3 @@
-creds/*
+hetzner*
+login*
+vars/ovpn_client
