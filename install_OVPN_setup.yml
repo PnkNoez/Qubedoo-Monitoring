@@ -1,0 +1,76 @@
+---
+- name: Setup OpenVPN client on server
+  hosts: test
+  become: yes
+  vars:
+    apt_packages:
+      - openvpn
+    config_file_path: "./vars/ovpn_client"
+    ovpn_file: "{{ lookup('file', config_file_path) }}"
+    login_conf: login.conf
+    service_file: /etc/systemd/system/openvpn-client.service
+    service_content: |
+      [Unit]
+      Description=OpenVPN client
+      After=network.target
+
+      [Service]
+      Type=simple
+      ExecStart=/usr/sbin/openvpn --config /etc/openvpn/client/{{ lookup('file', config_file_path) }}
+      Restart=on-failure
+      RestartSec=5
+
+      [Install]
+      WantedBy=multi-user.target
+
+  tasks:
+    - name: Update apt_packages
+      ansible.builtin.apt:
+        name: "{{apt_packages}}"
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Copy OpenVPN configuration file to server
+      copy:
+        src: "{{ ovpn_file }}"
+        dest: /etc/openvpn/client/{{ ovpn_file }}
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Copy login.conf to server
+      copy:
+        src: "{{ login_conf }}"
+        dest: /etc/openvpn/client/{{ login_conf }}
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Create and edit OpenVPN client service file
+      copy:
+        content: "{{ service_content }}"
+        dest: "{{ service_file }}"
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Reload systemd manager configuration
+      command: sudo systemctl daemon-reload
+
+    - name: Enable OpenVPN client service
+      systemd:
+        name: openvpn-client
+        enabled: yes
+
+    - name: Start OpenVPN client service
+      systemd:
+        name: openvpn-client
+        state: started
+
+    - name: Check status of OpenVPN client service
+      command: sudo systemctl status openvpn-client
+      register: service_status
+
+    - name: Display status of OpenVPN client service
+      debug:
+        var: service_status.stdout
